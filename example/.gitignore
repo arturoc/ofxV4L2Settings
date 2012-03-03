@@ -1,0 +1,8 @@
+Makefile
+*.cbp
+*.workspace
+config.make
+bin
+!bin/data
+!bin/data/*
+
