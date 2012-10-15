@@ -12,6 +12,7 @@
 #include <map>
 #include <linux/videodev2.h>
 #include "ofParameter.h"
+#include "ofParameterGroup.h"
 
 class ofxV4L2Settings {
 public:
@@ -26,13 +27,14 @@ public:
 		Control(){
 			id = -1;
 		}
+		Control(int fd, const struct v4l2_queryctrl & ctrl, const struct v4l2_control & c);
+
 		int id;
-		ofxParameter<int> parameter;
+		ofParameter<int> parameter;
 		enum v4l2_ctrl_type  type;
-		int		     minimum;	/* Note signedness */
-		int		     maximum;
 		int		     step;
 		int		     default_value;
+		vector<string> menu_options;
 
 		int operator=(int value){
 			if(id!=-1)
@@ -50,6 +52,7 @@ public:
 	}
 
 	map<string,Control> controls;
+	ofParameterGroup parameters;
 
 	static string LOG_NAME;
 

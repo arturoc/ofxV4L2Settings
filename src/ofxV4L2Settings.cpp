@@ -20,6 +20,30 @@
 #include "ofLog.h"
 string ofxV4L2Settings::LOG_NAME = "ofxV4L2Settings";
 
+
+ofxV4L2Settings::Control::Control(int fd, const struct v4l2_queryctrl & ctrl, const struct v4l2_control & c){
+	id = c.id;
+	parameter.set((char*)ctrl.name,c.value,ctrl.minimum,ctrl.maximum);
+	step = ctrl.step;
+	type = ctrl.type;
+	default_value = ctrl.default_value;
+
+	if(ctrl.type == V4L2_CTRL_TYPE_MENU){
+		struct v4l2_querymenu menu;
+		menu.id = c.id;
+		ofLogVerbose(LOG_NAME) << "control menu for " << ctrl.name;
+		for(int j=0;j<=ctrl.maximum;j++){
+			menu.index = j;
+			if(v4l2_ioctl(fd, VIDIOC_QUERYMENU, &menu)==0){
+				ofLogVerbose(LOG_NAME) << "    " << j << ": " << menu.name;
+				menu_options.push_back((char*)menu.name);
+			}else{
+				ofLogError(LOG_NAME) << "error couldn0t get menu option " << j<< strerror(errno);
+			}
+		}
+	}
+}
+
 ofxV4L2Settings::ofxV4L2Settings() {
 	fd=0;
 
@@ -32,12 +56,15 @@ ofxV4L2Settings::~ofxV4L2Settings() {
 bool ofxV4L2Settings::setup(string device){
     struct v4l2_queryctrl ctrl;
     struct v4l2_control c;
+    parameters.setName("v4l2 " + device);
 
     fd = v4l2_open(device.c_str(), O_RDWR, 0);
 	if(fd < 0) {
 		ofLogError(LOG_NAME) <<  "Unable to open " << device.c_str() << " " << strerror(errno);
 		return false;
 	}
+
+
 
 #ifdef V4L2_CTRL_FLAG_NEXT_CTRL
     /* Try the extended control API first */
@@ -55,17 +82,10 @@ bool ofxV4L2Settings::setup(string device){
 				continue;
 			}
 			if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
-				Control control;
-				control.id = c.id;
-				control.parameter.setName((char*)ctrl.name);
-				control.parameter = c.value;
-				control.maximum = ctrl.maximum;
-				control.minimum = ctrl.minimum;
-				control.step = ctrl.step;
-				control.type = ctrl.type;
-				control.default_value = ctrl.default_value;
+				Control control(fd,ctrl,c);
 				controls[control.parameter.getName()] = control;
 				control.parameter.addListener(this,&ofxV4L2Settings::parameterChanged);
+				parameters.add(control.parameter);
 			}
 		} while(v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &ctrl)== 0);
     } else
@@ -83,19 +103,13 @@ bool ofxV4L2Settings::setup(string device){
                    ctrl.type != V4L2_CTRL_TYPE_MENU) {
                     continue;
                 }
+
                 c.id = i;
                 if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
-                	Control control;
-                	control.id = c.id;
-    				control.parameter.setName((char*)ctrl.name);
-    				control.parameter = c.value;
-                	control.maximum = ctrl.maximum;
-                	control.minimum = ctrl.minimum;
-                	control.step = ctrl.step;
-                	control.type = ctrl.type;
-                	control.default_value = ctrl.default_value;
+    				Control control(fd,ctrl,c);
     				controls[control.parameter.getName()] = control;
     				control.parameter.addListener(this,&ofxV4L2Settings::parameterChanged);
+    				parameters.add(control.parameter);
                 }
             }
         }
@@ -112,19 +126,13 @@ bool ofxV4L2Settings::setup(string device){
                    ctrl.type != V4L2_CTRL_TYPE_MENU) {
                     continue;
                 }
+
                 c.id = i;
                 if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
-                	Control control;
-                	control.id = c.id;
-    				control.parameter.setName((char*)ctrl.name);
-    				control.parameter = c.value;
-                	control.maximum = ctrl.maximum;
-                	control.minimum = ctrl.minimum;
-                	control.step = ctrl.step;
-                	control.type = ctrl.type;
-                	control.default_value = ctrl.default_value;
+    				Control control(fd,ctrl,c);
     				controls[control.parameter.getName()] = control;
     				control.parameter.addListener(this,&ofxV4L2Settings::parameterChanged);
+    				parameters.add(control.parameter);
                 }
             } else {
                 break;
@@ -164,7 +172,6 @@ bool ofxV4L2Settings::set(string name, int value){
 			ofLogError(LOG_NAME) << name << " type not supported";
 			return false;
 		}
-
 		c.id = ctrl.id;
 		c.value = value;
 		if(v4l2_ioctl(fd, VIDIOC_S_CTRL, &c) != 0) {
@@ -181,7 +188,11 @@ bool ofxV4L2Settings::set(string name, int value){
 }
 
 void ofxV4L2Settings::parameterChanged(const void * sender,int & value){
-	ofxParameter<int> & param = *(ofxParameter<int>*)sender;
+	ofParameter<int> & param = *(ofParameter<int>*)sender;
 	set(param.getName(),value);
-	ofLogVerbose(LOG_NAME) << param.getName() << "=" << value;
+	if(controls[param.getName()].type==V4L2_CTRL_TYPE_MENU && value<(int)controls[param.getName()].menu_options.size()){
+		ofLogVerbose(LOG_NAME) << param.getName() << "=" << controls[param.getName()].menu_options[value];
+	}else{
+		ofLogVerbose(LOG_NAME) << param.getName() << "=" << value;
+	}
 }
