@@ -31,7 +31,7 @@ public:
 
 		int id;
 		ofParameter<int> parameter;
-		enum v4l2_ctrl_type  type;
+		__u32  type;
 		int		     step;
 		int		     default_value;
 		vector<string> menu_options;

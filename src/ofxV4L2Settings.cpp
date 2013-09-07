@@ -25,7 +25,7 @@ ofxV4L2Settings::Control::Control(int fd, const struct v4l2_queryctrl & ctrl, co
 	id = c.id;
 	parameter.set((char*)ctrl.name,c.value,ctrl.minimum,ctrl.maximum);
 	step = ctrl.step;
-	type = ctrl.type;
+	type = (__u32)ctrl.type;
 	default_value = ctrl.default_value;
 
 	if(ctrl.type == V4L2_CTRL_TYPE_MENU){
