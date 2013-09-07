@@ -4,11 +4,7 @@
 void testApp::setup(){
 	gui.setup("panel","settings.xml",0,0);
 	settings.setup("/dev/video0");
-	map<string,ofxV4L2Settings::Control>::iterator it;
-	for(it=settings.controls.begin();it!=settings.controls.end();it++){
-		cout << it->first << " " << it->second.parameter << endl;
-		gui.add(new ofxIntSlider(it->second.parameter.getName(),it->second.parameter,it->second.minimum,it->second.maximum));
-	}
+	gui.add(settings.parameters);
 
 	grabber.initGrabber(640,480);
 }
