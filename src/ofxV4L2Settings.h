@@ -36,7 +36,7 @@ public:
 		int		     default_value;
 		vector<string> menu_options;
 
-		int operator=(int value){
+		int operator=(const int & value){
 			if(id!=-1)
 				parameter = value;
 			return parameter;
@@ -47,8 +47,13 @@ public:
 		}
 	};
 
-	Control & operator[](string name){
-		return controls[name];
+	ofParameter<int> operator[](string name){
+		if(parameters.contains(name)){
+			return parameters[name].cast<int>();
+		}else{
+			ofLogError(LOG_NAME) << "parameter " << name << " doesn't exist returning empty parameter";
+			return ofParameter<int>();
+		}
 	}
 
 	map<string,Control> controls;

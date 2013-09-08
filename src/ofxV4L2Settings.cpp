@@ -83,6 +83,7 @@ bool ofxV4L2Settings::setup(string device){
 			}
 			if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
 				Control control(fd,ctrl,c);
+				ofLogVerbose(LOG_NAME) << "adding " << control.parameter.getName();
 				controls[control.parameter.getName()] = control;
 				control.parameter.addListener(this,&ofxV4L2Settings::parameterChanged);
 				parameters.add(control.parameter);
@@ -107,6 +108,7 @@ bool ofxV4L2Settings::setup(string device){
                 c.id = i;
                 if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
     				Control control(fd,ctrl,c);
+    				ofLogVerbose(LOG_NAME) << "adding " << control.parameter.getName();
     				controls[control.parameter.getName()] = control;
     				control.parameter.addListener(this,&ofxV4L2Settings::parameterChanged);
     				parameters.add(control.parameter);
@@ -130,6 +132,7 @@ bool ofxV4L2Settings::setup(string device){
                 c.id = i;
                 if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
     				Control control(fd,ctrl,c);
+    				ofLogVerbose(LOG_NAME) << "adding " << control.parameter.getName();
     				controls[control.parameter.getName()] = control;
     				control.parameter.addListener(this,&ofxV4L2Settings::parameterChanged);
     				parameters.add(control.parameter);
