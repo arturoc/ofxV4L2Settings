@@ -4,7 +4,7 @@
 #include "ofxV4L2Settings.h"
 #include "ofxGui.h"
 
-class testApp : public ofBaseApp{
+class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
