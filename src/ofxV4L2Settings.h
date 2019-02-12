@@ -19,8 +19,8 @@ public:
 	ofxV4L2Settings();
 	virtual ~ofxV4L2Settings();
 
-	bool setup(string device);
-	bool set(string name, int value);
+	bool setup(std::string device);
+	bool set(std::string name, int value);
 	void parameterChanged(const void * sender, int & value);
 
 	struct Control{
@@ -34,7 +34,7 @@ public:
 		__u32  type;
 		int		     step;
 		int		     default_value;
-		vector<string> menu_options;
+		vector<std::string> menu_options;
 
 		int operator=(const int & value){
 			if(id!=-1)
@@ -47,7 +47,7 @@ public:
 		}
 	};
 
-	ofParameter<int> operator[](string name){
+	ofParameter<int> operator[](std::string name){
 		if(parameters.contains(name)){
 			return parameters[name].cast<int>();
 		}else{
@@ -56,10 +56,10 @@ public:
 		}
 	}
 
-	map<string,Control> controls;
+	map<std::string,Control> controls;
 	ofParameterGroup parameters;
 
-	static string LOG_NAME;
+	static std::string LOG_NAME;
 
 private:
 	int fd;
