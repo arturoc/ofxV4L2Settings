@@ -18,7 +18,7 @@
 #include <linux/types.h>
 #include <libv4l2.h>
 #include "ofLog.h"
-string ofxV4L2Settings::LOG_NAME = "ofxV4L2Settings";
+std::string ofxV4L2Settings::LOG_NAME = "ofxV4L2Settings";
 
 
 ofxV4L2Settings::Control::Control(int fd, const struct v4l2_queryctrl & ctrl, const struct v4l2_control & c){
@@ -53,7 +53,7 @@ ofxV4L2Settings::~ofxV4L2Settings() {
 	if(fd) v4l2_close(fd);
 }
 
-bool ofxV4L2Settings::setup(string device){
+bool ofxV4L2Settings::setup(std::string device){
     struct v4l2_queryctrl ctrl;
     struct v4l2_control c;
     parameters.setName("v4l2 " + device);
@@ -147,7 +147,7 @@ bool ofxV4L2Settings::setup(string device){
 
 }
 
-bool ofxV4L2Settings::set(string name, int value){
+bool ofxV4L2Settings::set(std::string name, int value){
 	struct v4l2_queryctrl ctrl;
 	struct v4l2_control c;
 
