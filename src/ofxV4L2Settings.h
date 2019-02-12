@@ -34,7 +34,7 @@ public:
 		__u32  type;
 		int		     step;
 		int		     default_value;
-		vector<std::string> menu_options;
+		std::vector<std::string> menu_options;
 
 		int operator=(const int & value){
 			if(id!=-1)
@@ -56,7 +56,7 @@ public:
 		}
 	}
 
-	map<std::string,Control> controls;
+	std::map<std::string,Control> controls;
 	ofParameterGroup parameters;
 
 	static std::string LOG_NAME;

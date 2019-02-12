@@ -147,7 +147,7 @@ bool ofxV4L2Settings::setup(std::string device){
 
 }
 
-bool ofxV4L2Settings::set(string name, int value){
+bool ofxV4L2Settings::set(std::string name, int value){
 	struct v4l2_queryctrl ctrl;
 	struct v4l2_control c;
 
